@@ -1,36 +1,31 @@
-/**
- * Warlight AI Game Bot
- *
- * Last update: April 02, 2014
- *
- * @author Jim van Eeden
- * @version 1.0
- * @License MIT License (http://opensource.org/Licenses/MIT)
- */
+// Copyright 2014 theaigames.com (developers@theaigames.com)
+
+//    Licensed under the Apache License, Version 2.0 (the "License");
+//    you may not use this file except in compliance with the License.
+//    You may obtain a copy of the License at
+
+//        http://www.apache.org/licenses/LICENSE-2.0
+
+//    Unless required by applicable law or agreed to in writing, software
+//    distributed under the License is distributed on an "AS IS" BASIS,
+//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//    See the License for the specific language governing permissions and
+//    limitations under the License.
+//	
+//    For the full copyright and license information, please view the LICENSE
+//    file that was distributed with this source code.
 
 package bot;
-
-/**
- * This is a simple bot that does random (but correct) moves.
- * This class implements the Bot interface and overrides its Move methods.
- *  You can implements these methods yourself very easily now,
- * since you can retrieve all information about the match from variable “state”.
- * When the bot decided on the move to make, it returns an ArrayList of Moves. 
- * The bot is started by creating a Parser to which you add
- * a new instance of your bot, and then the parser is started.
- */
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 
 import main.Region;
-import main.SuperRegion;
 import move.AttackTransferMove;
 import move.PlaceArmiesMove;
 
 public class BotStarter implements Bot 
-{ 
-	
+{
 	@Override
 	/**
 	 * A method used at the start of the game to decide which player start with what Regions. 6 Regions are required to be returned.
@@ -39,7 +34,6 @@ public class BotStarter implements Bot
 	 */
 	public ArrayList<Region> getPreferredStartingRegions(BotState state, Long timeOut)
 	{
-		//System.out.println("\n\n\n****BotStarter getPreferredtartingRegions");
 		int m = 6;
 		ArrayList<Region> preferredStartingRegions = new ArrayList<Region>();
 		for(int i=0; i<m; i++)
@@ -66,8 +60,6 @@ public class BotStarter implements Bot
 	 */
 	public ArrayList<PlaceArmiesMove> getPlaceArmiesMoves(BotState state, Long timeOut) 
 	{
-		//System.out.println("\n\n\n****BotStarter getPlaceArmiesMoves");
-		//System.out.println("placing armies (first part of turn)");
 		
 		ArrayList<PlaceArmiesMove> placeArmiesMoves = new ArrayList<PlaceArmiesMove>();
 		String myName = state.getMyPlayerName();
@@ -99,8 +91,6 @@ public class BotStarter implements Bot
 	 */
 	public ArrayList<AttackTransferMove> getAttackTransferMoves(BotState state, Long timeOut) 
 	{
-		//System.out.println("\n\n\n****BotStarter getAttackTransferMoves");
-		//System.out.println("choosing attacks/transfers");
 		ArrayList<AttackTransferMove> attackTransferMoves = new ArrayList<AttackTransferMove>();
 		String myName = state.getMyPlayerName();
 		int armies = 5;
@@ -118,12 +108,12 @@ public class BotStarter implements Bot
 					int r = (int) (rand*possibleToRegions.size());
 					Region toRegion = possibleToRegions.get(r);
 					
-					if(!toRegion.getPlayerName().equals(myName) && fromRegion.getArmies() > 4) //do an attack
+					if(!toRegion.getPlayerName().equals(myName) && fromRegion.getArmies() > 6) //do an attack
 					{
 						attackTransferMoves.add(new AttackTransferMove(myName, fromRegion, toRegion, armies));
 						break;
 					}
-					else if(toRegion.getPlayerName().equals(myName) && fromRegion.getArmies() > 2) //do a transfer
+					else if(toRegion.getPlayerName().equals(myName) && fromRegion.getArmies() > 1) //do a transfer
 					{
 						attackTransferMoves.add(new AttackTransferMove(myName, fromRegion, toRegion, armies));
 						break;

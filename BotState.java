@@ -1,12 +1,19 @@
-/**
- * Warlight AI Game Bot
- *
- * Last update: April 02, 2014
- *
- * @author Jim van Eeden
- * @version 1.0
- * @License MIT License (http://opensource.org/Licenses/MIT)
- */
+// Copyright 2014 theaigames.com (developers@theaigames.com)
+
+//    Licensed under the Apache License, Version 2.0 (the "License");
+//    you may not use this file except in compliance with the License.
+//    You may obtain a copy of the License at
+
+//        http://www.apache.org/licenses/LICENSE-2.0
+
+//    Unless required by applicable law or agreed to in writing, software
+//    distributed under the License is distributed on an "AS IS" BASIS,
+//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//    See the License for the specific language governing permissions and
+//    limitations under the License.
+//	
+//    For the full copyright and license information, please view the LICENSE
+//    file that was distributed with this source code.
 
 package bot;
 
@@ -15,10 +22,6 @@ import java.util.ArrayList;
 import main.Map;
 import main.Region;
 import main.SuperRegion;
-
-import move.AttackTransferMove;
-import move.PlaceArmiesMove;
-import move.Move;
 
 public class BotState {
 	
@@ -30,24 +33,18 @@ public class BotState {
 	
 	private ArrayList<Region> pickableStartingRegions; //2 randomly chosen regions from each superregion are given, which the bot can chose to start with
 	
-	private ArrayList<Move> opponentMoves; //list of all the opponent's moves, reset at the end of each round
-
 	private int startingArmies; //number of armies the player can place on map
 	
 	private int roundNumber;
 	
 	public BotState()
 	{
-		//System.out.println("\n\n\n\n\n***************************************************************************\n*************************in constructor of BotState*************************\n***************************************************************************");
 		pickableStartingRegions = new ArrayList<Region>();
-		opponentMoves = new ArrayList<Move>();
 		roundNumber = 0;
 	}
 	
 	public void updateSettings(String key, String value)
 	{
-		//System.out.println("\n\n\n****BotState updateSettings");
-		//System.out.println("in updateSettings() BotState");
 		if(key.equals("your_bot")) //bot's own name
 			myName = value;
 		else if(key.equals("opponent_bot")) //opponent's name
@@ -62,8 +59,6 @@ public class BotState {
 	//initial map is given to the bot with all the information except for player and armies info
 	public void setupMap(String[] mapInput)
 	{
-		//System.out.println("\n\n\n****BotState setupMap");
-		//System.out.println("in setupMap() BotState");
 		int i, regionId, superRegionId, reward;
 		
 		if(mapInput[1].equals("super_regions"))
@@ -121,8 +116,6 @@ public class BotState {
 	//regions from wich a player is able to pick his preferred starting regions
 	public void setPickableStartingRegions(String[] mapInput)
 	{
-		//System.out.println("\n\n\n****BotState setPickableStartingRegions");
-		//System.out.println("in setPickableStartingRegions() BotState");
 		for(int i=2; i<mapInput.length; i++)
 		{
 			int regionId;
@@ -140,8 +133,6 @@ public class BotState {
 	//visible regions are given to the bot with player and armies info
 	public void updateMap(String[] mapInput)
 	{
-		//System.out.println("\n\n\n****BotState updateMap");
-		//System.out.println("in updateMap() BotState");
 		visibleMap = fullMap.getMapCopy();
 		for(int i=1; i<mapInput.length; i++)
 		{
@@ -167,87 +158,32 @@ public class BotState {
 		for(Region unknownRegion : unknownRegions)
 			visibleMap.getRegions().remove(unknownRegion);				
 	}
-
-	//Parses a list of the opponent's moves every round. 
-	//Clears it at the start, so only the moves of this round are stored.
-	public void readOpponentMoves(String[] moveInput)
-	{
-		//System.out.println("\n\n\n****BotState readOpponentMoves");
-		//System.out.println("in readOpponentMoves() BotState");
-		opponentMoves.clear();
-		for(int i=1; i<moveInput.length; i++)
-		{
-			try {
-				Move move;
-				if(moveInput[i+1].equals("place_armies")) {
-					Region region = visibleMap.getRegion(Integer.parseInt(moveInput[i+2]));
-					String playerName = moveInput[i];
-					int armies = Integer.parseInt(moveInput[i+3]);
-					move = new PlaceArmiesMove(playerName, region, armies);
-					i += 3;
-				}
-				else if(moveInput[i+1].equals("attack/transfer")) {
-					Region fromRegion = visibleMap.getRegion(Integer.parseInt(moveInput[i+2]));
-					if(fromRegion == null) //might happen if the region isn't visible
-						fromRegion = fullMap.getRegion(Integer.parseInt(moveInput[i+2]));
-
-					Region toRegion = visibleMap.getRegion(Integer.parseInt(moveInput[i+3]));
-					if(toRegion == null) //might happen if the region isn't visible
-						toRegion = fullMap.getRegion(Integer.parseInt(moveInput[i+3]));
-
-					String playerName = moveInput[i];
-					int armies = Integer.parseInt(moveInput[i+4]);
-					move = new AttackTransferMove(playerName, fromRegion, toRegion, armies);
-					i += 4;
-				}
-				else { //never happens
-					continue;
-				}
-				opponentMoves.add(move);
-			}
-			catch(Exception e) {
-				System.err.println("Unable to parse Opponent moves " + e.getMessage());
-			}
-		}
-	}
 	
 	public String getMyPlayerName(){
-		//System.out.println("\n\n\n****BotState getPlayerName");
 		return myName;
 	}
 	
 	public String getOpponentPlayerName(){
-		//System.out.println("\n\n\n****BotState getOpponentPlayerName");
 		return opponentName;
 	}
 	
 	public int getStartingArmies(){
-		//System.out.println("\n\n\n****BotState getStartingArmies");
 		return startingArmies;
 	}
 	
 	public int getRoundNumber(){
-		//System.out.println("\n\n\n****BotState getRoundNumber");
 		return roundNumber;
 	}
 	
 	public Map getVisibleMap(){
-		//System.out.println("\n\n\n****BotState getVisibleMap");
 		return visibleMap;
 	}
 	
 	public Map getFullMap(){
-		//System.out.println("\n\n\n****BotState getFullMap");
 		return fullMap;
-	}
-
-	public ArrayList<Move> getOpponentMoves(){
-		//System.out.println("\n\n\n****BotState getOpponentMoves");
-		return opponentMoves;
 	}
 	
 	public ArrayList<Region> getPickableStartingRegions(){
-		//System.out.println("\n\n\n****BotState getPickableStartingRegions");
 		return pickableStartingRegions;
 	}
 

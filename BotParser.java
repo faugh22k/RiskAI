@@ -1,12 +1,19 @@
-/**
- * Warlight AI Game Bot
- *
- * Last update: April 02, 2014
- *
- * @author Jim van Eeden
- * @version 1.0
- * @License MIT License (http://opensource.org/Licenses/MIT)
- */
+// Copyright 2014 theaigames.com (developers@theaigames.com)
+
+//    Licensed under the Apache License, Version 2.0 (the "License");
+//    you may not use this file except in compliance with the License.
+//    You may obtain a copy of the License at
+
+//        http://www.apache.org/licenses/LICENSE-2.0
+
+//    Unless required by applicable law or agreed to in writing, software
+//    distributed under the License is distributed on an "AS IS" BASIS,
+//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//    See the License for the specific language governing permissions and
+//    limitations under the License.
+//	
+//    For the full copyright and license information, please view the LICENSE
+//    file that was distributed with this source code.
 
 package bot;
 
@@ -27,7 +34,6 @@ public class BotParser {
 	
 	public BotParser(Bot bot)
 	{
-		//System.out.println("\n\n\n\n\n***************************************************************************\n*************************in constructor of BotParser*************************\n***************************************************************************");
 		this.scan = new Scanner(System.in);
 		this.bot = bot;
 		this.currentState = new BotState();
@@ -35,7 +41,6 @@ public class BotParser {
 	
 	public void run()
 	{
-		//System.out.println("\n\n\n****BotParser run");
 		while(scan.hasNextLine())
 		{
 			String line = scan.nextLine().trim();
@@ -80,9 +85,6 @@ public class BotParser {
 			} else if(parts[0].equals("update_map")) {
 				//all visible regions are given
 				currentState.updateMap(parts);
-			} else if(parts[0].equals("opponent_moves")) {
-				//all visible opponent moves are given
-				currentState.readOpponentMoves(parts);
 			} else {
 				System.err.printf("Unable to parse line \"%s\"\n", line);
 			}
