@@ -52,6 +52,7 @@ public class BotStarter implements Bot
 		return preferredStartingRegions;
 	}
 
+
 	@Override
 	/**
 	 * This method is called for at first part of each round. This example puts two armies on random regions
@@ -61,27 +62,82 @@ public class BotStarter implements Bot
 	public ArrayList<PlaceArmiesMove> getPlaceArmiesMoves(BotState state, Long timeOut) 
 	{
 		
+		// ArrayList<PlaceArmiesMove> placeArmiesMoves = new ArrayList<PlaceArmiesMove>();
+		// String myName = state.getMyPlayerName();
+		// int armies = 2;
+		// int armiesLeft = state.getStartingArmies();
+		// LinkedList<Region> visibleRegions = state.getVisibleMap().getRegions();
+		
+		// while(armiesLeft > 0)
+		// {
+		// 	double rand = Math.random();
+		// 	int r = (int) (rand*visibleRegions.size());
+		// 	Region region = visibleRegions.get(r);
+			
+		// 	if(region.ownedByPlayer(myName))
+		// 	{
+		// 		placeArmiesMoves.add(new PlaceArmiesMove(myName, region, armies));
+		// 		armiesLeft -= armies;
+		// 	}
+		// }
+
 		ArrayList<PlaceArmiesMove> placeArmiesMoves = new ArrayList<PlaceArmiesMove>();
 		String myName = state.getMyPlayerName();
-		int armies = 2;
-		int armiesLeft = state.getStartingArmies();
+
+		// number of armies left
+		int numArmies = state.getStartingArmies();
+
+		// find all regions held by player that is bordering other regions
 		LinkedList<Region> visibleRegions = state.getVisibleMap().getRegions();
-		
-		while(armiesLeft > 0)
-		{
-			double rand = Math.random();
-			int r = (int) (rand*visibleRegions.size());
-			Region region = visibleRegions.get(r);
-			
-			if(region.ownedByPlayer(myName))
-			{
-				placeArmiesMoves.add(new PlaceArmiesMove(myName, region, armies));
-				armiesLeft -= armies;
-			}
+		LinkedList<Region> borderingRegions = new LinkedList<Region>();
+
+		// current region being checked
+		Region current;
+
+		for(int i = 0; i < visibleRegions.size(); i++){
+
+			if(visibleRegions.get(i).ownedByPlayer(myName)){
+				
+				current = visibleRegions.get(i);
+
+				if(isBorder(current, myName)){
+	                borderingRegions.add(current);
+				}
+
 		}
-		
+		}
+
+        int numToPlace = (int)Math.ceil((double)numArmies/borderingRegions.size());
+     
+        int i = 0;
+		while(numArmies > 0 && borderingRegions.size() > 0){
+			placeArmiesMoves.add(new PlaceArmiesMove(myName, borderingRegions.get(i), numToPlace));
+			numArmies -= numToPlace;
+			i++;
+		}
+
 		return placeArmiesMoves;
 	}
+
+	private boolean isBorder(Region region, String myName){
+
+			LinkedList<Region> neighbors = region.getNeighbors();
+
+			int numNeighborsChecked = 0;
+			while(numNeighborsChecked < neighbors.size()){
+				
+				if(!neighbors.get(numNeighborsChecked).ownedByPlayer(myName)){
+
+					// add it to list then exit while loop
+					return true;
+				}
+				numNeighborsChecked++;
+			}
+
+			return false;
+	}
+
+
 
 	@Override
 	/**
@@ -108,15 +164,18 @@ public class BotStarter implements Bot
 					int r = (int) (rand*possibleToRegions.size());
 					Region toRegion = possibleToRegions.get(r);
 					
-					if(!toRegion.getPlayerName().equals(myName) && fromRegion.getArmies() > 6) //do an attack
+					if(!toRegion.getPlayerName().equals(myName) && fromRegion.getArmies() > 3) //do an attack
 					{
-						attackTransferMoves.add(new AttackTransferMove(myName, fromRegion, toRegion, armies));
+						attackTransferMoves.add(new AttackTransferMove(myName, fromRegion, toRegion, fromRegion.getArmies()/2));
 						break;
 					}
-					else if(toRegion.getPlayerName().equals(myName) && fromRegion.getArmies() > 1) //do a transfer
+					else if(toRegion.getPlayerName().equals(myName) && isBorder(toRegion, myName) && fromRegion.getArmies() > 1) //do a transfer
 					{
-						attackTransferMoves.add(new AttackTransferMove(myName, fromRegion, toRegion, armies));
+						if(!isBorder(fromRegion, myName)){
+						attackTransferMoves.add(new AttackTransferMove(myName, fromRegion, toRegion, fromRegion.getArmies()-1));
+					}
 						break;
+					 
 					}
 					else
 						possibleToRegions.remove(toRegion);
