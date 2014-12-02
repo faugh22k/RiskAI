@@ -15,7 +15,7 @@
 //    For the full copyright and license information, please view the LICENSE
 //    file that was distributed with this source code.
 
-package bot;
+package bot2;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -61,25 +61,6 @@ public class BotStarter implements Bot
 	 */
 	public ArrayList<PlaceArmiesMove> getPlaceArmiesMoves(BotState state, Long timeOut) 
 	{
-		
-		// ArrayList<PlaceArmiesMove> placeArmiesMoves = new ArrayList<PlaceArmiesMove>();
-		// String myName = state.getMyPlayerName();
-		// int armies = 2;
-		// int armiesLeft = state.getStartingArmies();
-		// LinkedList<Region> visibleRegions = state.getVisibleMap().getRegions();
-		
-		// while(armiesLeft > 0)
-		// {
-		// 	double rand = Math.random();
-		// 	int r = (int) (rand*visibleRegions.size());
-		// 	Region region = visibleRegions.get(r);
-			
-		// 	if(region.ownedByPlayer(myName))
-		// 	{
-		// 		placeArmiesMoves.add(new PlaceArmiesMove(myName, region, armies));
-		// 		armiesLeft -= armies;
-		// 	}
-		// }
 
 		ArrayList<PlaceArmiesMove> placeArmiesMoves = new ArrayList<PlaceArmiesMove>();
 		String myName = state.getMyPlayerName();
@@ -108,7 +89,7 @@ public class BotStarter implements Bot
 		}
 
         int numToPlace = (int)Math.ceil((double)numArmies/borderingRegions.size());
-     
+     	
         int i = 0;
 		while(numArmies > 0 && borderingRegions.size() > 0){
 			placeArmiesMoves.add(new PlaceArmiesMove(myName, borderingRegions.get(i), numToPlace));
@@ -149,7 +130,6 @@ public class BotStarter implements Bot
 	{
 		ArrayList<AttackTransferMove> attackTransferMoves = new ArrayList<AttackTransferMove>();
 		String myName = state.getMyPlayerName();
-		int armies = 5;
 		
 		for(Region fromRegion : state.getVisibleMap().getRegions())
 		{
@@ -157,16 +137,21 @@ public class BotStarter implements Bot
 			{
 				ArrayList<Region> possibleToRegions = new ArrayList<Region>();
 				possibleToRegions.addAll(fromRegion.getNeighbors());
-				
+		
 				while(!possibleToRegions.isEmpty())
 				{
 					double rand = Math.random();
 					int r = (int) (rand*possibleToRegions.size());
 					Region toRegion = possibleToRegions.get(r);
+
 					
 					if(!toRegion.getPlayerName().equals(myName) && fromRegion.getArmies() > 3) //do an attack
 					{
-						attackTransferMoves.add(new AttackTransferMove(myName, fromRegion, toRegion, fromRegion.getArmies()/2));
+						if(toRegion.getPlayerName().equals("neutral")){
+							attackTransferMoves.add(new AttackTransferMove(myName, fromRegion, toRegion, 4));
+						}else{
+						attackTransferMoves.add(new AttackTransferMove(myName, fromRegion, toRegion, (int)(fromRegion.getArmies()*0.6)));
+				      	}
 						break;
 					}
 					else if(toRegion.getPlayerName().equals(myName) && isBorder(toRegion, myName) && fromRegion.getArmies() > 1) //do a transfer
@@ -180,6 +165,7 @@ public class BotStarter implements Bot
 					else
 						possibleToRegions.remove(toRegion);
 				}
+
 			}
 		}
 		
